@@ -6,7 +6,7 @@ It uses the Imgur API to access images beyond the first few that are loaded by d
 ## Opening the viewer
 Whenever you are on an Imgur page that is recognized as an album, the viewer button will appear in the header, like this:
 
-![Viewer button](assets/viewerButton.png)
+![Viewer button](documentation/viewerButton.png)
 
 ## Navigation
 The arrow keys are unavailable because, by default, Imgur uses them to navigate between posts. This extension offers two choices to move between images: vim style and game style.
