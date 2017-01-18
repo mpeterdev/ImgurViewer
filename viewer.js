@@ -1,41 +1,36 @@
+// the index of the current image displayed in the viewer
 var currentImageIndex = 0;
+// array of links for all images in album
 var imageLinks;
+// top level viewer div
 var viewer;
+// viewer img element to display current image
 var viewerImg;
 
-// var imgs = document.getElementsByClassName("zoom");
-// var ii = 0;
-// for (ii; ii < imgs.length; ii++){
-// 	// imgs[ii].style.width = "200px";
-// 	// console.log(imgs[ii].width);
-// 	// imgs[ii].height = 200;
-// 	var watermark = document.createElement('img');
-// 	watermark.src = "http://www.wabmo.com/Album/watermark/watermarks/Sample-trans.png";
-// 	watermark.style.width = "100%";
-// 	watermark.style.height = "100%";
-// 	watermark.style.top = "0";
-// 	watermark.style.position = "absolute";
-// 	watermark.style.zIndex = 10;
-// 	imgs[ii].append(watermark);
-// }
+// create a button to launch the viewer that is styled to match Imgur's design
+var launchButton = document.createElement('button');
+launchButton.style.width = "100px";
+launchButton.style.height = "32px";
+launchButton.style.float = "left";
+launchButton.style.marginLeft = "15px";
+launchButton.style.marginTop = "9px";
+launchButton.style.borderRadius = "3px";
+launchButton.style.borderWidth = "0px";
+launchButton.style.backgroundColor = "#0098E1";
+launchButton.style.color = "white";
+launchButton.style.fontFamily = "'Open Sans',sans-serif";
+launchButton.style.fontSize = "14px";
+launchButton.style.fontWeight = "600";
+launchButton.innerHTML = 'Viewer';
 
-var header = document.getElementsByClassName("header-center")[0];
-var nextBtn = document.createElement('button');
-nextBtn.style.width = "100px";
-nextBtn.style.height = "32px";
-nextBtn.style.float = "left";
-nextBtn.style.marginLeft = "15px";
-nextBtn.style.marginTop = "9px";
-nextBtn.style.borderRadius = "3px";
-nextBtn.style.borderWidth = "0px";
-nextBtn.style.backgroundColor = "#0098E1";
-nextBtn.style.color = "white";
-nextBtn.style.fontFamily = "'Open Sans',sans-serif";
-nextBtn.style.fontSize = "14px";
-nextBtn.style.fontWeight = "600";
-nextBtn.innerHTML = 'Viewer';
-nextBtn.addEventListener('click', function(){
+// register a handler to make the API request and spawn the viewer when the
+// launch button is clicked
+launchButton.addEventListener('click', function(){
 	// find album ID
+	// NOTE originally the canonical URL was used, and it still seems more
+	// appropriate, but it does not update to reflect the user moving between
+	// albums so the current URL is being grabbed instead
+
 	// var canonicalURL = document.querySelector("link[rel=canonical]").getAttribute("href");
 	// var canonicalURL = window.location.href;
 	// var urlTokens = canonicalURL.split('/');
@@ -43,36 +38,41 @@ nextBtn.addEventListener('click', function(){
 	var urlTokens = window.location.href.split('/');
 	var tokenIndex = 0;
 	for (tokenIndex; tokenIndex < urlTokens.length; tokenIndex++){
+		// support both /gallery/id and /album/id URLs as they are essentially the
+		// same
 		if (urlTokens[tokenIndex] === 'a' || urlTokens[tokenIndex] === 'gallery'){
 			albumID = urlTokens[tokenIndex + 1];
 		}
 	}
-	// var albumID = urlTokens[urlTokens.length - 1];
-	// get image information from API
+	// get album information from API
 	var xhr = new XMLHttpRequest();
 	xhr.open("GET", "https://api.imgur.com/3/album/" + albumID);
 	xhr.setRequestHeader('Authorization', 'Client-ID 7c6bf9036879018');
 	xhr.onload = function(){
+		// for simplicity's sake, we are going to trust that the Imgur API won't
+		// give us a malformed response
 		var response = JSON.parse(this.responseText);
 		var imageDataArray = response.data.images;
 		imageLinks = [];
-		var jj = 0;
-		for (jj; jj < imageDataArray.length; jj++){
-			imageLinks.push(imageDataArray[jj].link.substring(5, imageDataArray[jj].link.length))
+		// iterate through all images and push their links onto the array
+		var ii = 0;
+		for (ii; ii < imageDataArray.length; ii++){
+			// trim the protocol before pushing
+			imageLinks.push(imageDataArray[ii].link.substring(5, imageDataArray[ii].link.length))
 		}
+		// create the viewer overlay
 		createViewer();
 	}
 	xhr.send();
 
-this.blur();
+	// blur the button to get rid of the surrounding highlight that appears when
+	// it is clicked
+	this.blur();
 });
-header.append(nextBtn);
 
-var nextImage = function(){
-	currentImageIndex++;
-	firstImage.src = imageLinks[currentImageIndex];
-	console.log('clicked');
-}
+// place the button into the page header
+var header = document.getElementsByClassName("header-center")[0];
+header.append(launchButton);
 
 function createViewer(){
 	console.log('Creating overlay');
@@ -113,6 +113,11 @@ function createViewer(){
 
 }
 
+/**
+ * Remove the viewer from the page and clear its reference so that it
+ * can be garbage collected
+ * @return {void}
+ */
 function removeViewer(){
 	if (viewer){
 		viewer.parentNode.removeChild(viewer);
@@ -121,6 +126,14 @@ function removeViewer(){
 	}
 }
 
+/**
+ * Register keyboard bindings
+ * a, h : previous
+ * d, l : next
+ * ESC  : exit viewer
+ * @param  {Object} e Keycode event
+ * @return {void}
+ */
 window.onkeydown = function(e){
 	if (viewer){
 		console.log(e.which);
@@ -134,6 +147,12 @@ window.onkeydown = function(e){
 	}
 }
 
+/**
+ * Switch out the visible image in the viewer to the prev/next image in the
+ * album
+ * @param  {String} changeTo can be 'prev' or 'next'
+ * @return {void}
+ */
 function changeImage(changeTo){
 	if (changeTo === 'next'){
 		currentImageIndex++;
@@ -144,8 +163,12 @@ function changeImage(changeTo){
 	preloadImages();
 }
 
+/**
+ * Throw the previous image and next three images into non-visible elements so
+ * that they are downloaded in the background
+ * @return {void}
+ */
 function preloadImages(){
-	/* Preload Images */
 	if (currentImageIndex <= imageLinks.length - 1)
 	{
 		var preloadImage = new Image();
@@ -167,18 +190,3 @@ function preloadImages(){
 		preloadImage4.src = imageLinks[currentImageIndex + 3];
 	}
 }
-
-// var imgs = document.getElementsByClassName("post-image-placeholder");
-// var ii = 0;
-// for (ii; ii < imgs.length; ii++){
-// 	imgs[ii].style.width = "200px";
-// 	console.log(imgs[ii].width);
-// 	// imgs[ii].height = 200;
-// }
-// var imgs = document.getElementsByClassName("js-post-image-thumb");
-// var ii = 0;
-// for (ii; ii < imgs.length; ii++){
-// 	imgs[ii].style.width = "200px";
-// 	console.log(imgs[ii].width);
-// 	// imgs[ii].height = 200;
-// }

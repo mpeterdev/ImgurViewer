@@ -3,7 +3,7 @@
 
   "name": "Imgur Viewer",
   "description": "A chrome extension to provide better Imgur album/gallery viewing with images zoomed to fit the window and easy navigation",
-  "version": "1.0",
+  "version": 2,
 
   "permissions": [
     "activeTab",
