@@ -74,8 +74,12 @@ launchButton.addEventListener('click', function(){
 var header = document.getElementsByClassName("header-center")[0];
 header.append(launchButton);
 
+/**
+ * Create the viewer and add it to the screen
+ * @return {void}
+ */
 function createViewer(){
-	console.log('Creating overlay');
+	// create the tinted overlay
 	viewer = document.createElement('div');
 	viewer.style.position = 'fixed';
 	viewer.style.zIndex = '102';
@@ -88,8 +92,11 @@ function createViewer(){
 	overlay.style.height = '100%';
 	overlay.style.backgroundColor = 'black';
 	overlay.style.opacity = '0.9';
+
+	// remove the viewer if the user clicks on the overlay outside of the image
 	overlay.addEventListener('click', removeViewer);
 
+	// create the image element with auto-fit properties
 	viewerImg = document.createElement('img');
 	viewerImg.src = imageLinks[0];
 	viewerImg.style.maxHeight = '96%';
@@ -103,6 +110,8 @@ function createViewer(){
 	viewerImg.style.right = '0';
 	viewerImg.style.margin = 'auto';
 	viewerImg.style.opacity = '1';
+
+	// alloy moving forward by clicking the image as well
 	viewerImg.addEventListener('click', function(){
 		changeImage('next');
 	});
