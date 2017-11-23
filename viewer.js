@@ -58,7 +58,7 @@ launchButton.addEventListener('click', function(){
 		var ii = 0;
 		for (ii; ii < imageDataArray.length; ii++){
 			// trim the protocol before pushing
-			imageLinks.push(imageDataArray[ii].link.substring(5, imageDataArray[ii].link.length))
+			imageLinks.push(imageDataArray[ii].link.replace(/^https?:/, ''));
 		}
 		// create the viewer overlay
 		createViewer();
