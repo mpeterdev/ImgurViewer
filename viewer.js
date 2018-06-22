@@ -146,9 +146,9 @@ function removeViewer(){
 window.onkeydown = function(e){
 	if (viewer){
 		console.log(e.which);
-		if ((e.which === 72 || e.which === 65) && currentImageIndex > 0){
+		if ((e.which === 37 || e.which === 72 || e.which === 65) && currentImageIndex > 0){
 			changeImage('prev');
-		} else if ((e.which === 76 || e.which === 68) && currentImageIndex < imageLinks.length - 1){
+		} else if ((e.which === 39 || e.which === 76 || e.which === 68) && currentImageIndex < imageLinks.length - 1){
 			changeImage('next');
 		} else if (e.which === 27){
 			removeViewer();
