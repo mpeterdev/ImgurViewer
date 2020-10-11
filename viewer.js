@@ -71,7 +71,7 @@ launchButton.addEventListener('click', function(){
 });
 
 // place the button into the page header
-var header = document.getElementsByClassName("header-center")[0];
+var header = document.getElementsByClassName("NavbarContainer-left")[0];
 header.append(launchButton);
 
 /**
